@@ -5,39 +5,41 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Дозволити CORS (заміни origin на свій фронт якщо хочеш обмежити)
+// CORS
 app.use(cors({
-  origin: '*', // Або: 'https://dashboard-0ucl.onrender.com'
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'X-Target-IP'],
 }));
 
-// Проксі маршрут
+// Проксі-кеш: зберігаємо проксі по IP
+const proxyCache = {};
+
 app.use('/api', (req, res, next) => {
   const ip = req.headers['x-target-ip'];
-
   if (!ip) {
     return res.status(400).json({ error: 'X-Target-IP header is required' });
   }
 
-  // Створюємо новий middleware-проксі для кожного запиту
-  const proxy = createProxyMiddleware({
-    target: `http://${ip}:3001`,
-    changeOrigin: true,
-    pathRewrite: { '^/api': '' },
-    onProxyReq: (proxyReq, req) => {
-      // Не пересилати зайві заголовки
-      proxyReq.removeHeader('Origin');
-    },
-    onError: (err, req, res) => {
-      console.error('Proxy error:', err);
-      res.status(502).json({ error: 'Bad Gateway. Check target IP or server availability.' });
-    }
-  });
+  if (!proxyCache[ip]) {
+    console.log(`[HPM] Creating new proxy for IP: ${ip}`);
+    proxyCache[ip] = createProxyMiddleware({
+      target: `http://${ip}:3001`,
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+      onProxyReq: (proxyReq, req) => {
+        proxyReq.removeHeader('Origin');
+      },
+      onError: (err, req, res) => {
+        console.error('Proxy error:', err.message);
+        res.status(502).json({ error: 'Bad Gateway' });
+      }
+    });
+  }
 
-  proxy(req, res, next);
+  proxyCache[ip](req, res, next);
 });
 
 app.listen(PORT, () => {
-  console.log(`Proxy listening on port ${PORT}`);
+  console.log(`✅ Proxy server running on port ${PORT}`);
 });
