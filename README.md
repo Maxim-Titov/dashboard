@@ -47,10 +47,11 @@ cd server
 npm start
 ```
 
-Start the client application:
+Start the client application (do ```npm build``` only once):
 
 ```bash
 cd ../client
+npm build
 npm start
 ```
 
@@ -127,10 +128,11 @@ cd server
 npm start
 ```
 
-Запустити клієнтський додаток:
+Запустити клієнтський додаток (виконайте ```npm build``` лише один раз)::
 
 ```bash
 cd ../client
+npm build
 npm start
 ```
 
