@@ -13,7 +13,7 @@ export default defineConfig({
         name: 'Dashboard',
         short_name: 'Dashboard',
         description: 'Dashboard for managing your applications',
-        theme_color: '#ffffff',
+        theme_color: '#222222',
         icons: [
           {
             src: 'pwa-192x192.png',

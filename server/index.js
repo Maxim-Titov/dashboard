@@ -4,9 +4,11 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
+const https = require('https');
+const selfsigned = require('selfsigned');
 
 const app = express();
-const PORT = 3001;
+const PORT = 3001; // HTTPS стандартний порт
 
 app.use(cors());
 app.use(express.json());
@@ -183,6 +185,21 @@ app.delete('/delete-program/:id', (req, res) => {
   res.json({ message: `Програму "${id}" та її зображення видалено` });
 });
 
-app.listen(PORT, () => {
-  console.log(`Сервер запущено на http://localhost:${PORT}`);
+// --- Генеруємо самопідписаний сертифікат для HTTPS ---
+const attrs = [{ name: 'commonName', value: 'localhost' }];
+const pems = selfsigned.generate(attrs, {
+  days: 365,
+  keySize: 2048,   // важливо, щоб ключ був не менше 2048 біт
+  algorithm: 'sha256', // сучасний алгоритм підпису
+});
+
+// --- Запускаємо HTTPS сервер ---
+https.createServer(
+  {
+    key: pems.private,
+    cert: pems.cert,
+  },
+  app
+).listen(PORT, () => {
+  console.log(`HTTPS сервер запущено на https://localhost:${PORT}`);
 });

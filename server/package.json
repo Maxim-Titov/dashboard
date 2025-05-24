@@ -12,6 +12,8 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "multer": "^2.0.0"
+    "https": "^1.0.0",
+    "multer": "^2.0.0",
+    "selfsigned": "^2.4.1"
   }
 }
