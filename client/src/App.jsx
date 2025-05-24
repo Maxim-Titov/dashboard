@@ -44,7 +44,7 @@ class App extends React.Component {
 	async connectToServer(ip) {
 		try {
 			// Завантаження списку програм
-			const res = await fetch(`http://${ip}:3001/programs`)
+			const res = await fetch(`https://${ip}:3001/programs`)
 			const programs = await res.json()
 
 			this.setState({
@@ -115,7 +115,7 @@ class App extends React.Component {
 
 	async loadPrograms(ip) {
 		try {
-			const res = await fetch(`http://${ip}:3001/programs`)
+			const res = await fetch(`https://${ip}:3001/programs`)
 			const programs = await res.json()
 			this.setState({ programs })
 		} catch (e) {
@@ -133,7 +133,7 @@ class App extends React.Component {
 			formData.append("image", newProgramImageFile)
 
 			try {
-				const uploadRes = await fetch(`http://${ip}:3001/upload-image`, {
+				const uploadRes = await fetch(`https://${ip}:3001/upload-image`, {
 					method: "POST",
 					body: formData,
 				})
@@ -146,7 +146,7 @@ class App extends React.Component {
 			}
 		}
 
-		await fetch(`http://${ip}:3001/add-program`, {
+		await fetch(`https://${ip}:3001/add-program`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
@@ -183,7 +183,7 @@ class App extends React.Component {
 		}
 
 		try {
-			const res = await fetch(`http://${ip}:3001/edit-program`, {
+			const res = await fetch(`https://${ip}:3001/edit-program`, {
 				method: 'PUT',
 				body: formData
 			})
@@ -192,7 +192,7 @@ class App extends React.Component {
 
 			if (!res.ok) return alert(data.error)
 
-			const refreshed = await fetch(`http://${ip}:3001/programs`)
+			const refreshed = await fetch(`https://${ip}:3001/programs`)
 			const updatedPrograms = await refreshed.json()
 
 			this.setState({ programs: updatedPrograms })
@@ -205,7 +205,7 @@ class App extends React.Component {
 		const { ip } = this.state;
 
 		try {
-			const res = await fetch(`http://${ip}:3001/delete-program/${id}`, {
+			const res = await fetch(`https://${ip}:3001/delete-program/${id}`, {
 				method: 'DELETE'
 			})
 
@@ -213,7 +213,7 @@ class App extends React.Component {
 
 			if (!res.ok) return alert(data.error)
 
-			const refreshed = await fetch(`http://${ip}:3001/programs`)
+			const refreshed = await fetch(`https://${ip}:3001/programs`)
 			const updatedPrograms = await refreshed.json()
 
 			this.setState({ programs: updatedPrograms })
