@@ -7,14 +7,12 @@ import AddProgram from './components/AddProgram'
 import EditProgram from './components/EditProgram'
 import DeleteProgram from './components/DeleteProgram'
 
-const PROXY_URL = 'https://dashboard-proxy-9dmh.onrender.com/api'
-
 class App extends React.Component {
 	constructor(props) {
 		super(props)
 
 		this.state = {
-			page: 'programs',
+			page: 'programs', // 'prograps', 'add', 'edit', 'delete'
 			isConnected: false,
 			ip: '',
 			selectedIp: '',
@@ -22,7 +20,7 @@ class App extends React.Component {
 			programs: [],
 			newProgramId: '',
 			newProgramLabel: '',
-			newProgramImageFile: null,
+  			newProgramImageFile: null,
 			editIds: {},
 			editCommands: {},
 			editImages: {}
@@ -45,9 +43,8 @@ class App extends React.Component {
 
 	async connectToServer(ip) {
 		try {
-			const res = await fetch(`${PROXY_URL}/programs`, {
-				headers: { 'X-Target-IP': ip }
-			})
+			// Завантаження списку програм
+			const res = await fetch(`http://${ip}:3001/programs`)
 			const programs = await res.json()
 
 			this.setState({
@@ -55,6 +52,7 @@ class App extends React.Component {
 				isConnected: true,
 				programs
 			})
+
 		} catch (e) {
 			alert('Не вдалося підключитися або отримати список програм')
 		}
@@ -64,14 +62,11 @@ class App extends React.Component {
 		this.setState({ status: 'Відправляю команду...' })
 
 		try {
-			const res = await fetch(`${PROXY_URL}/launch`, {
+			const res = await fetch(`http://${this.state.ip}:3001/launch`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-Target-IP': this.state.ip
-				},
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ program: programId })
-			})
+			});
 
 			const data = await res.json()
 
@@ -106,7 +101,9 @@ class App extends React.Component {
 	}
 
 	async handleImageChange(file) {
-		this.setState({ newProgramImageFile: file })
+		this.setState({
+			newProgramImageFile: file
+		})
 	}
 
 	async handleEditImageChange(id, file) {
@@ -115,15 +112,14 @@ class App extends React.Component {
 		}))
 	}
 
+
 	async loadPrograms(ip) {
 		try {
-			const res = await fetch(`${PROXY_URL}/programs`, {
-				headers: { 'X-Target-IP': ip }
-			})
+			const res = await fetch(`http://${ip}:3001/programs`)
 			const programs = await res.json()
 			this.setState({ programs })
 		} catch (e) {
-			alert('Не вдалося оновити список програм')
+			alert("Не вдалося оновити список програм")
 		}
 	}
 
@@ -133,42 +129,42 @@ class App extends React.Component {
 
 		if (newProgramImageFile) {
 			const formData = new FormData()
+
 			formData.append("image", newProgramImageFile)
 
 			try {
-				const uploadRes = await fetch(`${PROXY_URL}/upload-image`, {
+				const uploadRes = await fetch(`http://${ip}:3001/upload-image`, {
 					method: "POST",
-					headers: {
-						'X-Target-IP': ip
-					},
-					body: formData
+					body: formData,
 				})
+
 				const uploadData = await uploadRes.json()
+
 				filename = uploadData.filename
 			} catch (err) {
 				console.error("Помилка завантаження зображення:", err)
 			}
 		}
 
-		await fetch(`${PROXY_URL}/add-program`, {
+		await fetch(`http://${ip}:3001/add-program`, {
 			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"X-Target-IP": ip
-			},
+			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-				id: newProgramId,
-				command: newProgramId,
-				label: newProgramLabel,
-				image: filename
-			})
+			id: newProgramId,
+			command: newProgramId,
+			label: newProgramLabel,
+			image: filename,
+			}),
 		})
 
-		this.setState({
-			newProgramId: "",
-			newProgramLabel: "",
-			newProgramImageFile: null
-		}, () => this.loadPrograms(ip))
+		this.setState(
+			{
+				newProgramId: "",
+				newProgramLabel: "",
+				newProgramImageFile: null,
+			},
+			() => this.loadPrograms(ip)
+		)
 	}
 
 	async handleEditProgram(originalId) {
@@ -187,9 +183,8 @@ class App extends React.Component {
 		}
 
 		try {
-			const res = await fetch(`${PROXY_URL}/edit-program`, {
+			const res = await fetch(`http://${ip}:3001/edit-program`, {
 				method: 'PUT',
-				headers: { 'X-Target-IP': ip },
 				body: formData
 			})
 
@@ -197,26 +192,31 @@ class App extends React.Component {
 
 			if (!res.ok) return alert(data.error)
 
-			await this.loadPrograms(ip)
+			const refreshed = await fetch(`http://${ip}:3001/programs`)
+			const updatedPrograms = await refreshed.json()
+
+			this.setState({ programs: updatedPrograms })
 		} catch (e) {
 			alert('Помилка оновлення програми')
 		}
 	}
 
 	async handleDeleteProgram(id) {
-		const { ip } = this.state
+		const { ip } = this.state;
 
 		try {
-			const res = await fetch(`${PROXY_URL}/delete-program/${id}`, {
-				method: 'DELETE',
-				headers: { 'X-Target-IP': ip }
+			const res = await fetch(`http://${ip}:3001/delete-program/${id}`, {
+				method: 'DELETE'
 			})
 
 			const data = await res.json()
 
 			if (!res.ok) return alert(data.error)
 
-			await this.loadPrograms(ip)
+			const refreshed = await fetch(`http://${ip}:3001/programs`)
+			const updatedPrograms = await refreshed.json()
+
+			this.setState({ programs: updatedPrograms })
 		} catch (e) {
 			alert('Помилка видалення програми')
 		}
@@ -227,7 +227,9 @@ class App extends React.Component {
 	}
 
 	handleChangePage(page) {
-		this.setState({ page })
+		this.setState({
+			page: page
+		})
 	}
 
 	renderPage() {
@@ -267,7 +269,7 @@ class App extends React.Component {
 				return (
 					<DeleteProgram
 						programs={this.state.programs}
-						handleDeleteProgram={this.handleDeleteProgram}
+						handleDeleteProgram={this.handleDeleteProgram.bind(this)}
 					/>
 				)
 			default:
@@ -289,6 +291,7 @@ class App extends React.Component {
 		return (
 			<>
 				<Header page={this.state.page} handleChangePage={this.handleChangePage} />
+
 				<div className="main-wrapper">
 					<main>
 						<div className="container">
@@ -300,5 +303,6 @@ class App extends React.Component {
 		)
 	}
 }
+
 
 export default App
