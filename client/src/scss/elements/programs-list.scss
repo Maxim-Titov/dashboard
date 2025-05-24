@@ -1,0 +1,25 @@
+@import '../global/variables';
+
+.programs-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $gutterS;
+
+    .program-button {
+        aspect-ratio: 1/1;
+        width: 100%;
+        height: auto;
+        background-color: rgba(white, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: $gutterS;
+
+        img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+    }
+}

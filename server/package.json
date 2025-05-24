@@ -1,0 +1,17 @@
+{
+  "name": "dashboard-server",
+  "version": "1.0.0",
+  "description": "Server for dashboard app",
+  "license": "ISC",
+  "author": "Maxim Titov",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "multer": "^2.0.0"
+  }
+}

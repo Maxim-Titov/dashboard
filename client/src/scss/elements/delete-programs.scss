@@ -1,0 +1,29 @@
+@import '../global/variables';
+
+.delete-programs-wrapper {
+    .delete-program {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: $gutterM;
+        padding: 0 $gutterM $gutterM $gutterM;
+        border-bottom: 1px solid rgba(white, 0.3);
+
+        p {
+            font-size: 25px;
+            width: 60%;
+        }
+
+        button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            width: 30%;
+            height: 40px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+    }
+}

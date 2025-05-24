@@ -1,0 +1,29 @@
+@import '../global/mixins';
+
+.main-menu {
+    nav {
+        ul {
+            @include li-reset;
+
+            display: flex;
+            justify-content: center;
+
+            li {
+                border-bottom: 1px solid white;
+                padding: 0.5rem 1rem;
+                margin-right: 1rem;
+                font-size: 20px;
+                font-weight: 600;
+
+                &:last-child {
+                    margin-right: 0;
+                }
+
+                &.active {
+                    border: 1px solid white;
+                    border-radius: 8px;
+                }
+            }
+        }
+    }
+}

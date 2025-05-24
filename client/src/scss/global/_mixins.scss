@@ -1,0 +1,27 @@
+@mixin li-reset {
+    padding: 0;
+    margin: 0;
+
+    li {
+        list-style: none;
+    }
+}
+
+// @mixin button-style ($bgcolor, $color, $border, $hover-bgcolor) {
+//     background-color: $bgcolor;
+//     color: $color;
+//     border: $border;
+//     padding: 15px 20px;
+//     text-transform: uppercase;
+//     letter-spacing: 1px;
+//     transition: background-color 0.3s;
+//     cursor: pointer;
+
+//     &:hover {
+//         background-color: $hover-bgcolor;
+//     }
+
+//     &:active {
+//         transform: scale(0.98);
+//     }
+// }
