@@ -54,6 +54,16 @@ cd ../client
 npm start
 ```
 
+### Adding Programs
+
+1. Go to the **"Add"** tab.
+2. In the **ID** field, enter the launch command:
+   - For Windows — the full path to the `.exe` file (e.g. `C:\Program Files\Example\app.exe`);
+   - For Linux — just the command name (e.g. `firefox` or `code`).
+3. Fill in the **Label** field — this will be the display name in the interface.
+4. Optionally, upload an image — it will be used as the program icon.
+5. Click **"Save"** to add the program to the list.
+
 ### Requirements
 
 - Node.js (v14+ recommended)
@@ -123,6 +133,16 @@ npm start
 cd ../client
 npm start
 ```
+
+### Додавання програм
+
+1. Перейдіть у вкладку **"Add"**.
+2. У полі **ID** вкажіть команду запуску:
+   - для Windows — повний шлях до `.exe` файлу, наприклад: `C:\Program Files\Example\app.exe`;
+   - для Linux — просто назву команди, наприклад: `firefox` або `code`.
+3. Заповніть поле **Label** — це назва, яка відображатиметься в інтерфейсі.
+4. За бажанням додайте зображення — воно буде використовуватись як іконка.
+5. Натисніть **"Save"**, щоб додати програму до списку.
 
 ### Вимоги
 
