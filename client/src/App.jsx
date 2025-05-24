@@ -7,7 +7,7 @@ import AddProgram from './components/AddProgram'
 import EditProgram from './components/EditProgram'
 import DeleteProgram from './components/DeleteProgram'
 
-const PROXY_URL = 'https://your-proxy.onrender.com/api'
+const PROXY_URL = 'https://dashboard-proxy-9dmh.onrender.com/api'
 
 class App extends React.Component {
 	constructor(props) {
