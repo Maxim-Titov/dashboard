@@ -16,10 +16,22 @@
         justify-content: center;
         padding: $gutterS;
 
+        &.clicked {
+            animation: bounce 0.4s ease;
+        }
+
         img {
             width: 100%;
             height: auto;
             border-radius: 12px;
         }
     }
+}
+
+
+@keyframes bounce {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.1); }
+    50%  { transform: scale(0.95); }
+    100% { transform: scale(1); }
 }
