@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Dashboard Control</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <h2>Dashboard Control</h2>
+
+    <div class="path">
+		<div class="input">
+			<label>Path to server:</label><br />
+			<input id="serverPath" placeholder="Enter path to server folder" />
+		</div>
+
+		<div class="input">
+			<label>Path to client:</label><br />
+			<input id="clientPath" placeholder="Enter path to client folder" />
+		</div>
+
+		<div class="button">
+			<button id="savePathsBtn">Save paths</button>
+		</div>
+	</div>
+
+    <div class="stop-and-start">
+		<button id="startBtn" disabled>Start</button>
+   		<button id="stopBtn" disabled>Stop</button>
+	</div>
+
+    <p id="status">Waiting to start...</p>
+
+    <script>
+        const serverInput = document.getElementById('serverPath');
+        const clientInput = document.getElementById('clientPath');
+        const saveBtn = document.getElementById('savePathsBtn');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const status = document.getElementById('status');
+
+        function updateButtons(enabled) {
+            startBtn.disabled = !enabled;
+            stopBtn.disabled = !enabled;
+        }
+
+        saveBtn.onclick = () => {
+            const serverDir = serverInput.value.trim();
+            const clientDir = clientInput.value.trim();
+
+            if (!serverDir || !clientDir) {
+                status.innerText = '❌ Both paths must be provided';
+                return;
+            }
+
+            window.api.send('set-paths', { serverDir, clientDir });
+            status.innerText = 'Paths saved. You can start now.';
+            updateButtons(true);
+        };
+
+        startBtn.onclick = () => {
+            window.api.send('start-dashboard');
+            status.innerText = 'Starting...';
+        };
+
+        stopBtn.onclick = () => {
+            window.api.send('stop-dashboard');
+            status.innerText = 'Stopping...';
+        };
+
+        window.api.receive('status-update', (msg) => {
+            status.innerText = msg;
+        });
+
+        window.api.receive('load-paths', (paths) => {
+            if (paths.serverDir) serverInput.value = paths.serverDir;
+            if (paths.clientDir) clientInput.value = paths.clientDir;
+
+            if (paths.serverDir && paths.clientDir) {
+                status.innerText = 'Paths loaded. You can start now.';
+                updateButtons(true);
+            }
+        });
+    </script>
+</body>
+</html>
