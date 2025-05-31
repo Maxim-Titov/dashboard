@@ -1,6 +1,7 @@
 @import '../global/mixins';
 
-.main-menu {
+.main-menu,
+.programs-menu {
     nav {
         ul {
             @include li-reset;
@@ -9,21 +10,33 @@
             justify-content: center;
 
             li {
-                border-bottom: 1px solid white;
                 padding: 0.5rem 1rem;
                 margin-right: 1rem;
                 font-size: 20px;
                 font-weight: 600;
+                color: rgba(white, 0.8);
+                transition: all 200ms ease;
+                margin-bottom: 2px;
+                cursor: pointer;
 
                 &:last-child {
                     margin-right: 0;
                 }
 
+                &:hover {
+                    color: white;
+                }
+
                 &.active {
-                    border: 1px solid white;
-                    border-radius: 8px;
+                    border-bottom: 2px solid white;
+                    color: rgba(white, 1);
+                    margin-bottom: 0;
                 }
             }
         }
     }
+}
+
+.programs-menu {
+    margin-bottom: $gutterM;
 }

@@ -1,2 +1,27 @@
 {
+    "code": {
+        "command": "code",
+        "label": "VS Code",
+        "image": "1748087077385-Visual_Studio_Code_1.35_icon.svg.png"
+    },
+    "kitty": {
+        "command": "kitty",
+        "label": "Terminal",
+        "image": "1748087184419-9035031_terminal_icon.png"
+    },
+    "google-chrome-stable": {
+        "command": "google-chrome-stable",
+        "label": "Chrome",
+        "image": "1748087307287-87865_chrome_icon.png"
+    },
+    "spotify": {
+        "command": "spotify",
+        "label": "Spotify",
+        "image": "1748087369557-9796018_spotify_icon.png"
+    },
+    "youtube-music": {
+        "command": "youtube-music",
+        "label": "YouTube Music",
+        "image": "1748087451425-8197859_youtube_music_social network_song_multimedia_icon.png"
+    }
 }

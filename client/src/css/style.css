@@ -95,36 +95,53 @@ header {
   padding: 30px 0;
 }
 
-.main-menu nav ul {
+.main-menu nav ul,
+.programs-menu nav ul {
   padding: 0;
   margin: 0;
   display: flex;
   justify-content: center;
 }
-.main-menu nav ul li {
+.main-menu nav ul li,
+.programs-menu nav ul li {
   list-style: none;
 }
-.main-menu nav ul li {
-  border-bottom: 1px solid white;
+.main-menu nav ul li,
+.programs-menu nav ul li {
   padding: 0.5rem 1rem;
   margin-right: 1rem;
   font-size: 20px;
   font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 200ms ease;
+  margin-bottom: 2px;
+  cursor: pointer;
 }
-.main-menu nav ul li:last-child {
+.main-menu nav ul li:last-child,
+.programs-menu nav ul li:last-child {
   margin-right: 0;
 }
-.main-menu nav ul li.active {
-  border: 1px solid white;
-  border-radius: 8px;
+.main-menu nav ul li:hover,
+.programs-menu nav ul li:hover {
+  color: white;
+}
+.main-menu nav ul li.active,
+.programs-menu nav ul li.active {
+  border-bottom: 2px solid white;
+  color: white;
+  margin-bottom: 0;
 }
 
-.programs-wrapper {
+.programs-menu {
+  margin-bottom: 20px;
+}
+
+.programs-list .programs-wrapper {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
 }
-.programs-wrapper .program-button {
+.programs-list .programs-wrapper .program-button {
   aspect-ratio: 1/1;
   width: 100%;
   height: auto;
@@ -135,10 +152,10 @@ header {
   justify-content: center;
   padding: 10px;
 }
-.programs-wrapper .program-button.clicked {
+.programs-list .programs-wrapper .program-button.clicked {
   animation: bounce 0.4s ease;
 }
-.programs-wrapper .program-button img {
+.programs-list .programs-wrapper .program-button img {
   width: 100%;
   height: auto;
   border-radius: 12px;

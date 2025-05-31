@@ -3,16 +3,14 @@ import React from 'react'
 import Connect from './components/Connect'
 import Header from './components/Header'
 import ProgramsList from './components/ProgramsList'
-import AddProgram from './components/AddProgram'
-import EditProgram from './components/EditProgram'
-import DeleteProgram from './components/DeleteProgram'
+import VoiceControl from './components/VoiceControl'
 
 class App extends React.Component {
 	constructor(props) {
 		super(props)
 
 		this.state = {
-			page: 'programs', // 'prograps', 'add', 'edit', 'delete'
+			page: 'programs', // 'prograps', 'voice'
 			isConnected: false,
 			ip: '',
 			selectedIp: '',
@@ -20,7 +18,7 @@ class App extends React.Component {
 			programs: [],
 			newProgramId: '',
 			newProgramLabel: '',
-  			newProgramImageFile: null,
+			newProgramImageFile: null,
 			editIds: {},
 			editCommands: {},
 			editImages: {}
@@ -150,10 +148,10 @@ class App extends React.Component {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
-			id: newProgramId,
-			command: newProgramId,
-			label: newProgramLabel,
-			image: filename,
+				id: newProgramId,
+				command: newProgramId,
+				label: newProgramLabel,
+				image: filename,
 			}),
 		})
 
@@ -240,40 +238,29 @@ class App extends React.Component {
 						programs={this.state.programs}
 						launchProgram={this.launchProgram}
 						ip={this.state.ip}
-					/>
-				)
-			case 'add':
-				return (
-					<AddProgram
+						page={this.state.page}
+						handleChangePage={this.handleChangePage}
 						handleProgramIdChange={this.handleProgramIdChange}
 						handleProgramLabelChange={this.handleProgramLabelChange}
 						handleAddProgram={this.handleAddProgram}
 						newProgramId={this.state.newProgramId}
 						newProgramLabel={this.state.newProgramLabel}
 						handleImageChange={this.handleImageChange}
-					/>
-				)
-			case 'edit':
-				return (
-					<EditProgram
-						programs={this.state.programs}
 						editIds={this.state.editIds}
 						editCommands={this.state.editCommands}
 						handleEditIdChange={this.handleEditIdChange}
 						handleEditCommandChange={this.handleEditCommandChange}
 						handleEditProgram={this.handleEditProgram}
 						handleEditImageChange={this.handleEditImageChange}
-					/>
-				)
-			case 'delete':
-				return (
-					<DeleteProgram
-						programs={this.state.programs}
 						handleDeleteProgram={this.handleDeleteProgram.bind(this)}
 					/>
 				)
+			case 'voice':
+				return (
+					<VoiceControl />
+				)
 			default:
-				return <div>Programs</div>
+				return <div>Page</div>
 		}
 	}
 

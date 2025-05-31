@@ -7,9 +7,7 @@ class MainMenu extends React.Component {
                 <nav>
                     <ul className="pixel-font">
                         <li className={this.props.page === 'programs' ? 'active' : null} onClick={() => this.props.handleChangePage('programs')}>Programs</li>
-                        <li className={this.props.page === 'add' ? 'active' : null} onClick={() => this.props.handleChangePage('add')}>Add</li>
-                        <li className={this.props.page === 'edit' ? 'active' : null} onClick={() => this.props.handleChangePage('edit')}>Edit</li>
-                        <li className={this.props.page === 'delete' ? 'active' : null} onClick={() => this.props.handleChangePage('delete')}>Delete</li>
+                        <li className={this.props.page === 'voice' ? 'active' : null} onClick={() => this.props.handleChangePage('voice')}>Voice</li>
                     </ul>
                 </nav>
             </div>
