@@ -257,7 +257,10 @@ class App extends React.Component {
 				)
 			case 'voice':
 				return (
-					<VoiceControl />
+					<VoiceControl
+						programs={this.state.programs}
+						launchProgram={this.launchProgram}
+					/>
 				)
 			default:
 				return <div>Page</div>

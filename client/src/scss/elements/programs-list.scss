@@ -16,6 +16,12 @@
             align-items: center;
             justify-content: center;
             padding: $gutterS;
+            transition: all 200ms ease;
+
+            &:hover {
+                transform: scale(1.1);
+                background-color: rgba(white, 0.2);
+            }
 
             &.clicked {
                 animation: bounce 0.4s ease;

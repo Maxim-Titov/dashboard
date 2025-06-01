@@ -30,6 +30,12 @@
             border-radius: 8px;
             color: white;
             font-size: 15px;
+            cursor: pointer;
+            transition: all 200ms ease;
+
+            &:hover {
+                background-color: rgba(white, 0.1);
+            }
         }
     }
 }

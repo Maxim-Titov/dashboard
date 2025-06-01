@@ -89,6 +89,11 @@ h5 {
   border-radius: 8px;
   color: white;
   font-size: 15px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+.connect-wrapper form button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 header {
@@ -151,6 +156,11 @@ header {
   align-items: center;
   justify-content: center;
   padding: 10px;
+  transition: all 200ms ease;
+}
+.programs-list .programs-wrapper .program-button:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 .programs-list .programs-wrapper .program-button.clicked {
   animation: bounce 0.4s ease;
@@ -207,6 +217,11 @@ header {
   border-radius: 8px;
   color: white;
   font-size: 20px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+.add-program-wrapper button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .edit-program-wrapper {
@@ -259,6 +274,11 @@ header {
   border-radius: 8px;
   color: white;
   font-size: 20px;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+.edit-program-wrapper div button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .delete-programs-wrapper .delete-program {
@@ -283,19 +303,26 @@ header {
   height: 40px;
   font-size: 20px;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+.delete-programs-wrapper .delete-program button:hover {
+  background-color: #e74432;
 }
 
-.voice-controll-wrapper .info-text {
+.voice-controll-wrapper .info {
   position: absolute;
-  top: 30%;
+  top: 100px;
   left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  width: 80%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 60vh;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
+  padding: 20px;
+}
+.voice-controll-wrapper .info-text {
   font-size: 25px;
-  padding: 10px 0;
 }
 .voice-controll-wrapper button {
   position: absolute;
@@ -309,4 +336,10 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  border: none;
+  transition: all 200ms ease;
+}
+.voice-controll-wrapper button:hover {
+  transform: translateX(-50%) scale(1.1);
 }

@@ -18,11 +18,34 @@ class VoiceControl extends React.Component {
         }
     }
 
+    componentDidUpdate(prevProps) {
+        if (prevProps.transcript !== this.props.transcript) {
+            this.checkTranscriptForCommand(this.props.transcript)
+        }
+    }
+
     startListening = () => {
         SpeechRecognition.startListening({
             continuous: true,
             language: 'uk-UA',
         })
+    }
+
+    checkTranscriptForCommand = (text) => {
+        const normalized = text.toLowerCase().trim()
+
+        if (normalized.includes("відкрий") || normalized.includes("запусти")) {
+            for (const program of this.props.programs) {
+                const labelMatch = program.label?.toLowerCase().trim()
+                const idMatch = program.id?.toLowerCase().trim()
+
+                if (normalized.includes(labelMatch) || normalized.includes(idMatch)) {
+                    this.props.launchProgram(program.id)
+                    this.props.resetTranscript()
+                    break
+                }
+            }
+        }
     }
 
     stopListening = () => {
@@ -34,7 +57,7 @@ class VoiceControl extends React.Component {
             case false:
                 return (
                     <button onClick={() => {
-                        this.props.resetTranscript
+                        this.props.resetTranscript()
                         this.startListening()
                         this.setState({
                             isListening: true
@@ -69,8 +92,7 @@ class VoiceControl extends React.Component {
         return (
             <div className='voice-controll-wrapper'>
                 <div className="info">
-                    {/* <p className='info-listening'><strong>Listening:</strong> {listening ? 'Yes' : 'No'}</p> */}
-                    <p className='info-text'><strong>Text:</strong> {transcript}</p>
+                    <p className='info-text'>{transcript}</p>
                 </div>
 
                 {this.renderButton()}

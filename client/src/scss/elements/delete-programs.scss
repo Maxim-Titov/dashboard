@@ -24,6 +24,12 @@
             height: 40px;
             font-size: 20px;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 200ms ease;
+
+            &:hover {
+                background-color: #e74432;
+            }
         }
     }
 }
