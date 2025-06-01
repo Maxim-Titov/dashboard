@@ -21,7 +21,9 @@ class App extends React.Component {
 			newProgramImageFile: null,
 			editIds: {},
 			editCommands: {},
-			editImages: {}
+			editImages: {},
+			availableDevices: [],
+			localIp: '',
 		}
 
 		this.connectToServer = this.connectToServer.bind(this)
@@ -37,6 +39,79 @@ class App extends React.Component {
 		this.handleImageChange = this.handleImageChange.bind(this)
 		this.handleEditImageChange = this.handleEditImageChange.bind(this)
 		this.loadPrograms = this.loadPrograms.bind(this)
+		this.scanNetwork = this.scanNetwork.bind(this)
+	}
+
+	componentDidMount() {
+		this.getLocalIPs((ips) => {
+			if (ips.length > 0) {
+				const localIp = ips[0]
+				this.setState({ localIp })
+
+				const subnet = localIp.split('.').slice(0, 3).join('.') + '.'
+				this.scanNetwork(subnet)
+			} else {
+				this.scanNetwork('192.168.0.')
+			}
+		})
+	}
+
+	getLocalIPs = (callback) => {
+		const ips = new Set()
+		const pc = new RTCPeerConnection({ iceServers: [] })
+
+		pc.createDataChannel('')
+		pc.createOffer()
+			.then(offer => pc.setLocalDescription(offer))
+			.catch(() => { })
+
+		pc.onicecandidate = (event) => {
+			if (!event.candidate) {
+				callback(Array.from(ips))
+
+				return
+			}
+			const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3})/
+			const ipMatch = event.candidate.candidate.match(ipRegex)
+			if (ipMatch) {
+				ips.add(ipMatch[1])
+			}
+		};
+	}
+
+	scanNetwork = async (subnet) => {
+		const foundDevices = []
+		const promises = []
+
+		for (let i = 1; i <= 254; i++) {
+			const ip = subnet + i
+
+			const p = new Promise((resolve) => {
+				const controller = new AbortController();
+				const timeoutId = setTimeout(() => {
+					controller.abort();
+				}, 1000)
+
+				fetch(`http://${ip}:3001/programs`, { signal: controller.signal })
+					.then(res => {
+						clearTimeout(timeoutId)
+						if (res.ok) {
+							foundDevices.push(ip)
+						}
+						resolve()
+					})
+					.catch(() => {
+						clearTimeout(timeoutId)
+						resolve()
+					})
+			})
+
+			promises.push(p)
+		}
+
+		await Promise.all(promises)
+
+		this.setState({ availableDevices: foundDevices })
 	}
 
 	playSound = (sound) => {
@@ -287,6 +362,7 @@ class App extends React.Component {
 					selectedIp={this.state.selectedIp}
 					handleSelectedIpChange={this.handleSelectedIpChange}
 					connectToServer={this.connectToServer}
+					availableDevices={this.state.availableDevices}
 				/>
 			)
 		}
@@ -306,6 +382,5 @@ class App extends React.Component {
 		)
 	}
 }
-
 
 export default App

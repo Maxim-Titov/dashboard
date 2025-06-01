@@ -1,3 +1,5 @@
+@import '../global/mixins';
+
 .connect-wrapper {
     width: 100%;
     height: 100vh;
@@ -19,6 +21,10 @@
             border-radius: 8px;
             color: white;
             font-size: 15px;
+        }
+
+        ul {
+            @include li-reset;
         }
 
         button {
