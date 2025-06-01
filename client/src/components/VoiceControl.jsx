@@ -16,12 +16,43 @@ class VoiceControl extends React.Component {
         this.state = {
             isListening: false
         }
+
+        this.okSounds = [
+            '/sounds/ok1.wav',
+            '/sounds/ok2.wav',
+            '/sounds/ok3.wav',
+            '/sounds/ok4.wav'
+        ]
+
+        this.greetSounds = [
+            '/sounds/greet1.wav',
+            '/sounds/greet2.wav',
+            '/sounds/greet3.wav'
+        ]
     }
 
     componentDidUpdate(prevProps) {
         if (prevProps.transcript !== this.props.transcript) {
             this.checkTranscriptForCommand(this.props.transcript)
         }
+    }
+
+    playSound = (sound) => {
+        const audio = new Audio(sound)
+
+        audio.play().catch((e) => {
+            console.warn("Cannot play sound:", e)
+        })
+    }
+
+    playRandomSound = (sounds) => {
+        const randomIndex = Math.floor(Math.random() * sounds.length);
+        const randomSound = sounds[randomIndex];
+
+        const audio = new Audio(randomSound);
+        audio.play().catch((e) => {
+            console.warn("Cannot play sound:", e);
+        });
     }
 
     startListening = () => {
@@ -42,9 +73,24 @@ class VoiceControl extends React.Component {
                 if (normalized.includes(labelMatch) || normalized.includes(idMatch)) {
                     this.props.launchProgram(program.id)
                     this.props.resetTranscript()
+
+                    this.playRandomSound(this.okSounds)
+
                     break
                 }
             }
+        }
+
+        if (normalized.includes("альфред")) {
+            this.props.resetTranscript()
+
+            this.playRandomSound(this.greetSounds)
+        }
+
+        if (normalized.includes("дякую")) {
+            this.props.resetTranscript()
+
+            this.playSound('/sounds/thanks.wav')
         }
     }
 
