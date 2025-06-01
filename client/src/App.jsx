@@ -39,9 +39,20 @@ class App extends React.Component {
 		this.loadPrograms = this.loadPrograms.bind(this)
 	}
 
+	playSound = (sound) => {
+		const audio = new Audio(sound)
+
+		audio.onerror = (e) => {
+			console.warn("Cannot play sound:", e)
+		}
+
+		audio.play().catch((e) => {
+			console.warn("Cannot play sound:", e)
+		})
+	}
+
 	async connectToServer(ip) {
 		try {
-			// Завантаження списку програм
 			const res = await fetch(`http://${ip}:3001/programs`)
 			const programs = await res.json()
 
@@ -50,6 +61,8 @@ class App extends React.Component {
 				isConnected: true,
 				programs
 			})
+
+			this.playSound('/sounds/game_mode.wav')
 
 		} catch (e) {
 			alert('Не вдалося підключитися або отримати список програм')

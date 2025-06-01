@@ -1,11 +1,12 @@
 import React from 'react'
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-import { FaMicrophone, FaRegStopCircle } from "react-icons/fa";
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+import { FaMicrophone, FaRegStopCircle } from "react-icons/fa"
+import Fuse from 'fuse.js'
 
 function withSpeechRecognition(WrappedComponent) {
     return function Wrapper(props) {
-        const speechProps = useSpeechRecognition();
-        return <WrappedComponent {...props} {...speechProps} />;
+        const speechProps = useSpeechRecognition()
+        return <WrappedComponent {...props} {...speechProps} />
     }
 }
 
@@ -14,7 +15,8 @@ class VoiceControl extends React.Component {
         super(props)
 
         this.state = {
-            isListening: false
+            isSpeaking: false,
+            shouldListenAfterSound: true, // новий прапорець
         }
 
         this.okSounds = [
@@ -29,106 +31,179 @@ class VoiceControl extends React.Component {
             '/sounds/greet2.wav',
             '/sounds/greet3.wav'
         ]
+
+        this.playSound = this.playSound.bind(this)
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.transcript !== this.props.transcript) {
+        const finishedSpeaking = prevProps.listening && !this.props.listening
+        const hasTranscript = this.props.transcript && this.props.transcript.trim() !== ''
+
+        if (finishedSpeaking && hasTranscript && !this.state.isSpeaking) {
             this.checkTranscriptForCommand(this.props.transcript)
         }
     }
 
-    playSound = (sound) => {
+    findBestMatchingProgram = (spokenText) => {
+        const programNames = this.props.programs.map(p => ({
+            id: p.id,
+            label: p.label
+        }))
+
+        const fuse = new Fuse(programNames, {
+            keys: ['label', 'id'],
+            threshold: 0.4,
+        })
+
+        const results = fuse.search(spokenText);
+
+        if (results.length > 0) {
+            return results[0].item
+        }
+
+        return null
+    }
+
+    playSound = (sound, callback) => {
+        this.setState({ isSpeaking: true })
+
+        SpeechRecognition.stopListening()
+
         const audio = new Audio(sound)
+
+        const resumeListening = () => {
+            this.setState({ isSpeaking: false })
+
+            // Враховуємо прапорець
+            if (this.state.shouldListenAfterSound) {
+                this.startListening()
+            }
+
+            if (typeof callback === 'function') callback()
+        }
+
+        audio.onended = resumeListening
+        audio.onerror = (e) => {
+            console.warn("Cannot play sound:", e)
+            resumeListening()
+        }
 
         audio.play().catch((e) => {
             console.warn("Cannot play sound:", e)
+            resumeListening()
         })
     }
 
-    playRandomSound = (sounds) => {
-        const randomIndex = Math.floor(Math.random() * sounds.length);
-        const randomSound = sounds[randomIndex];
-
-        const audio = new Audio(randomSound);
-        audio.play().catch((e) => {
-            console.warn("Cannot play sound:", e);
-        });
+    playRandomSound = (sounds, callback) => {
+        const randomIndex = Math.floor(Math.random() * sounds.length)
+        const randomSound = sounds[randomIndex]
+        this.playSound(randomSound, callback)
     }
 
     startListening = () => {
         SpeechRecognition.startListening({
-            continuous: true,
+            continuous: false,
             language: 'uk-UA',
         })
+    }
+
+    stopListening = () => {
+        SpeechRecognition.stopListening()
     }
 
     checkTranscriptForCommand = (text) => {
         const normalized = text.toLowerCase().trim()
 
+        const stopCommands = ['стоп', 'перестань слухати', 'вимкнись']
+
         if (normalized.includes("відкрий") || normalized.includes("запусти")) {
-            for (const program of this.props.programs) {
-                const labelMatch = program.label?.toLowerCase().trim()
-                const idMatch = program.id?.toLowerCase().trim()
+            const textAfterCommand = normalized
+                .replace("відкрий", "")
+                .replace("запусти", "")
+                .trim()
 
-                if (normalized.includes(labelMatch) || normalized.includes(idMatch)) {
-                    this.props.launchProgram(program.id)
+            const programList = this.props.programs.map(p => ({
+                id: p.id,
+                label: p.label
+            }))
+
+            const fuse = new Fuse(programList, {
+                keys: ['label', 'id'],
+                threshold: 0.4
+            })
+
+            const results = fuse.search(textAfterCommand)
+
+            if (results.length > 0) {
+                const matchedProgram = results[0].item
+
+                this.playRandomSound(this.okSounds, () => {
+                    this.props.launchProgram(matchedProgram.id)
                     this.props.resetTranscript()
+                })
 
-                    this.playRandomSound(this.okSounds)
-
-                    break
-                }
+                return
+            } else {
+                console.error("Error command")
+                this.props.resetTranscript()
+                return
             }
         }
 
-        if (normalized.includes("альфред")) {
-            this.props.resetTranscript()
-
-            this.playRandomSound(this.greetSounds)
+        if (normalized === "альфред") {
+            this.playRandomSound(this.greetSounds, () => {
+                this.props.resetTranscript()
+            })
+            return
         }
 
         if (normalized.includes("дякую")) {
-            this.props.resetTranscript()
-
-            this.playSound('/sounds/thanks.wav')
+            this.playSound('/sounds/thanks.wav', () => {
+                this.props.resetTranscript()
+            })
+            return
         }
-    }
 
-    stopListening = () => {
-        SpeechRecognition.stopListening();
+        if (stopCommands.some(cmd => normalized.includes(cmd))) {
+            this.setState({ shouldListenAfterSound: false }, () => {
+                this.playSound('/sounds/greet1.wav', () => {
+                    this.stopListening()
+                    this.props.resetTranscript()
+                })
+            })
+            return
+        }
+
+        this.playSound('/sounds/not_found.wav', () => {
+            this.props.resetTranscript()
+        })
     }
 
     renderButton() {
-        switch (this.state.isListening) {
-            case false:
-                return (
-                    <button onClick={() => {
-                        this.props.resetTranscript()
-                        this.startListening()
-                        this.setState({
-                            isListening: true
-                        })
-                    }}><FaMicrophone /></button>
-                )
-            case true:
-                return (
-                    <button onClick={() => {
-                        this.stopListening()
-                        this.setState({
-                            isListening: false
-                        })
-                    }}><FaRegStopCircle /></button>
-                )
-            default:
-                return Micro
-        }
+        const { listening } = this.props
+
+        return listening ? (
+            <button onClick={() => {
+                this.stopListening()
+            }}>
+                <FaRegStopCircle />
+            </button>
+        ) : (
+            <button onClick={() => {
+                this.setState({ shouldListenAfterSound: true }, () => {
+                    this.props.resetTranscript()
+                    this.startListening()
+                })
+            }}>
+                <FaMicrophone />
+            </button>
+        )
     }
 
     render() {
         const {
             browserSupportsSpeechRecognition,
             transcript,
-            listening,
         } = this.props
 
         if (!browserSupportsSpeechRecognition) {
@@ -140,7 +215,6 @@ class VoiceControl extends React.Component {
                 <div className="info">
                     <p className='info-text'>{transcript}</p>
                 </div>
-
                 {this.renderButton()}
             </div>
         )

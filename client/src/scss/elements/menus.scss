@@ -32,6 +32,11 @@
                     color: rgba(white, 1);
                     margin-bottom: 0;
                 }
+
+                &.blocked {
+                    text-decoration: line-through;
+                    color: rgba(white, 0.2);
+                }
             }
         }
     }

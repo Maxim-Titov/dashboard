@@ -136,6 +136,11 @@ header {
   color: white;
   margin-bottom: 0;
 }
+.main-menu nav ul li.blocked,
+.programs-menu nav ul li.blocked {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.2);
+}
 
 .programs-menu {
   margin-bottom: 20px;
@@ -320,6 +325,9 @@ header {
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .voice-controll-wrapper .info-text {
   font-size: 25px;
