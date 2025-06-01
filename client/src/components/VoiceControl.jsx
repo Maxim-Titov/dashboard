@@ -1,5 +1,6 @@
 import React from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import { FaMicrophone, FaRegStopCircle } from "react-icons/fa";
 
 function withSpeechRecognition(WrappedComponent) {
     return function Wrapper(props) {
@@ -33,11 +34,12 @@ class VoiceControl extends React.Component {
             case false:
                 return (
                     <button onClick={() => {
+                        this.props.resetTranscript
                         this.startListening()
                         this.setState({
                             isListening: true
                         })
-                    }}>🎙️ Start</button>
+                    }}><FaMicrophone /></button>
                 )
             case true:
                 return (
@@ -46,7 +48,7 @@ class VoiceControl extends React.Component {
                         this.setState({
                             isListening: false
                         })
-                    }}>⛔️ Stop</button>
+                    }}><FaRegStopCircle /></button>
                 )
             default:
                 return Micro
@@ -58,7 +60,6 @@ class VoiceControl extends React.Component {
             browserSupportsSpeechRecognition,
             transcript,
             listening,
-            resetTranscript,
         } = this.props
 
         if (!browserSupportsSpeechRecognition) {
@@ -66,12 +67,13 @@ class VoiceControl extends React.Component {
         }
 
         return (
-            <div>
-                {this.renderButton()}
+            <div className='voice-controll-wrapper'>
+                <div className="info">
+                    {/* <p className='info-listening'><strong>Listening:</strong> {listening ? 'Yes' : 'No'}</p> */}
+                    <p className='info-text'><strong>Text:</strong> {transcript}</p>
+                </div>
 
-                <button onClick={resetTranscript}>♻️ Clear</button>
-                <p><strong>Listening:</strong> {listening ? 'Yes' : 'No'}</p>
-                <p><strong>Text:</strong> {transcript}</p>
+                {this.renderButton()}
             </div>
         )
     }

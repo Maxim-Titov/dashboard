@@ -1,0 +1,32 @@
+@import '../global/variables';
+
+.voice-controll-wrapper {
+    .info {
+        &-text {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            width: 80%;
+            background-color: rgba(white, 0.1);
+            border-radius: 12px;
+            font-size: 25px;
+            padding: $gutterS 0;
+        }
+    }
+
+    button {
+        position: absolute;
+        left: 50%;
+        bottom: 100px;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 100px;
+        border-radius: 100%;
+        font-size: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
