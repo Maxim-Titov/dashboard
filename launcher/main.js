@@ -75,7 +75,7 @@ function startProcess(dir) {
 }
 
 function startPcProcess(dir) {
-    return runNpmCommand(['run', 'dev'], dir);
+    return runNpmCommand(['run', 'electron'], dir);
 }
 
 function killProcess(proc) {
