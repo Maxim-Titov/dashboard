@@ -1,4 +1,5 @@
-// public/preload.js
-window.addEventListener('DOMContentLoaded', () => {
-    console.log('Electron preload script loaded');
-});
+const { contextBridge } = require('electron')
+
+contextBridge.exposeInMainWorld('electron', {
+    log: (msg) => console.log(msg)
+})
