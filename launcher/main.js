@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const kill = require('tree-kill');
 
 let serverProcess = null;
 let clientProcess = null;
@@ -9,14 +10,11 @@ let clientProcess = null;
 const isWindows = process.platform === 'win32';
 const npmCmd = isWindows ? 'npm.cmd' : 'npm';
 
-// User paths to be saved/loaded
 let serverDir = null;
 let clientDir = null;
 
-// Config file to save paths
 const configPath = path.join(app.getPath('userData'), 'paths.json');
 
-// Function to load saved paths
 function loadPaths() {
     try {
         if (fs.existsSync(configPath)) {
@@ -31,7 +29,6 @@ function loadPaths() {
     }
 }
 
-// Function to save paths to file
 function savePaths() {
     try {
         const data = JSON.stringify({ serverDir, clientDir }, null, 2);
@@ -42,16 +39,13 @@ function savePaths() {
     }
 }
 
-// Universal function to run npm commands
 function runNpmCommand(args, cwd) {
     return spawn(npmCmd, args, {
         cwd,
-        detached: true,
-        stdio: 'ignore'
+        shell: true
     });
 }
 
-// Check and install dependencies
 function checkAndInstall(dir) {
     return new Promise((resolve, reject) => {
         if (!fs.existsSync(path.join(dir, 'node_modules'))) {
@@ -66,7 +60,6 @@ function checkAndInstall(dir) {
     });
 }
 
-// Build client
 function buildClient() {
     return new Promise((resolve, reject) => {
         const build = runNpmCommand(['run', 'build'], clientDir);
@@ -77,16 +70,32 @@ function buildClient() {
     });
 }
 
-// Start process (server or client)
 function startProcess(dir) {
     return runNpmCommand(['start'], dir);
 }
 
-// Create window
+function startPcProcess(dir) {
+    return runNpmCommand(['run', 'dev'], dir);
+}
+
+function killProcess(proc) {
+    return new Promise((resolve) => {
+        if (!proc || proc.killed) {
+            resolve();
+            return;
+        }
+        kill(proc.pid, 'SIGKILL', (err) => {
+            if (err) console.error('Kill error:', err);
+            else console.log('Killed PID:', proc.pid);
+            resolve();
+        });
+    });
+}
+
 function createWindow() {
     const win = new BrowserWindow({
         width: 400,
-        height: 460,
+        height: 550,
         resizable: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
@@ -99,18 +108,15 @@ function createWindow() {
     return win;
 }
 
-// Main app logic on ready
 app.whenReady().then(() => {
     loadPaths();
 
     const win = createWindow();
 
-    // After page load send saved paths to renderer
     win.webContents.on('did-finish-load', () => {
         win.webContents.send('load-paths', { serverDir, clientDir });
     });
 
-    // Receive paths from renderer and save them
     ipcMain.on('set-paths', (event, paths) => {
         serverDir = paths.serverDir;
         clientDir = paths.clientDir;
@@ -118,8 +124,7 @@ app.whenReady().then(() => {
         console.log('Received paths:', serverDir, clientDir);
     });
 
-    // Start dashboard
-    ipcMain.on('start-dashboard', async () => {
+    ipcMain.on('start-dashboard', async (event, mode) => {
         if (!serverDir || !clientDir) {
             win.webContents.send('status-update', '❌ Server or client paths are not set');
             return;
@@ -134,22 +139,38 @@ app.whenReady().then(() => {
             await buildClient();
 
             win.webContents.send('status-update', 'Starting server and client...');
+
             serverProcess = startProcess(serverDir);
-            clientProcess = startProcess(clientDir);
+
+            if (mode === 'pc') {
+                clientProcess = startPcProcess(clientDir);
+            } else if (mode === 'mobile') {
+                clientProcess = startProcess(clientDir);
+            } else {
+                throw new Error(`Unknown mode: ${mode}`);
+            }
 
             win.webContents.send('status-update', '✅ Running');
         } catch (err) {
+            console.error('Error starting dashboard:', err);
             win.webContents.send('status-update', `❌ Error: ${err}`);
         }
     });
 
-    // Stop dashboard
-    ipcMain.on('stop-dashboard', () => {
+    ipcMain.on('stop-dashboard', async () => {
         try {
-            if (serverProcess) process.kill(-serverProcess.pid);
-            if (clientProcess) process.kill(-clientProcess.pid);
+            console.log('Stopping server PID:', serverProcess?.pid);
+            console.log('Stopping client PID:', clientProcess?.pid);
+
+            await killProcess(serverProcess);
+            serverProcess = null;
+
+            await killProcess(clientProcess);
+            clientProcess = null;
+
             win.webContents.send('status-update', '🛑 Stopped');
         } catch (e) {
+            console.error('Error stopping processes:', e);
             win.webContents.send('status-update', '❌ Failed to stop processes');
         }
     });

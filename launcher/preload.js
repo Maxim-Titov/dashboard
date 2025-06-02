@@ -2,7 +2,6 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('api', {
   send: (channel, data) => {
-    // Перелік дозволених каналів
     const validChannels = ['start-dashboard', 'stop-dashboard', 'set-paths'];
     if (validChannels.includes(channel)) {
       ipcRenderer.send(channel, data);

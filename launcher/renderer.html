@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <title>Dashboard Control</title>
@@ -11,29 +12,40 @@
 
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
     <h2>Dashboard Control</h2>
 
     <div class="path">
-		<div class="input">
-			<label>Path to server:</label><br />
-			<input id="serverPath" placeholder="Enter path to server folder" />
-		</div>
+        <div class="input">
+            <label>Path to server:</label><br />
+            <input id="serverPath" placeholder="Enter path to server folder" />
+        </div>
 
-		<div class="input">
-			<label>Path to client:</label><br />
-			<input id="clientPath" placeholder="Enter path to client folder" />
-		</div>
+        <div class="input">
+            <label>Path to client:</label><br />
+            <input id="clientPath" placeholder="Enter path to client folder" />
+        </div>
 
-		<div class="button">
-			<button id="savePathsBtn">Save paths</button>
-		</div>
-	</div>
+        <div class="button">
+            <button id="savePathsBtn">Save paths</button>
+        </div>
+    </div>
 
-    <div class="stop-and-start">
-		<button id="startBtn" disabled>Start</button>
-   		<button id="stopBtn" disabled>Stop</button>
-	</div>
+    <div class="start-btns">
+        <p>Start</p>
+
+        <div class="buttons">
+            <button id="startPcBtn" disabled>PC</button>
+            <button id="startMobileBtn" disabled>Mobile</button>
+        </div>
+    </div>
+
+    <div class="stop-btn">
+        <p>Stop</p>
+
+        <button id="stopBtn" disabled>Stop</button>
+    </div>
 
     <p id="status">Waiting to start...</p>
 
@@ -41,12 +53,14 @@
         const serverInput = document.getElementById('serverPath');
         const clientInput = document.getElementById('clientPath');
         const saveBtn = document.getElementById('savePathsBtn');
-        const startBtn = document.getElementById('startBtn');
+        const startPcBtn = document.getElementById('startPcBtn');
+        const startMobileBtn = document.getElementById('startMobileBtn');
         const stopBtn = document.getElementById('stopBtn');
         const status = document.getElementById('status');
 
         function updateButtons(enabled) {
-            startBtn.disabled = !enabled;
+            startPcBtn.disabled = !enabled;
+            startMobileBtn.disabled = !enabled;
             stopBtn.disabled = !enabled;
         }
 
@@ -64,8 +78,13 @@
             updateButtons(true);
         };
 
-        startBtn.onclick = () => {
-            window.api.send('start-dashboard');
+        startPcBtn.onclick = () => {
+            window.api.send('start-dashboard', 'pc');
+            status.innerText = 'Starting...';
+        };
+
+        startMobileBtn.onclick = () => {
+            window.api.send('start-dashboard', 'mobile');
             status.innerText = 'Starting...';
         };
 
@@ -89,4 +108,5 @@
         });
     </script>
 </body>
+
 </html>
